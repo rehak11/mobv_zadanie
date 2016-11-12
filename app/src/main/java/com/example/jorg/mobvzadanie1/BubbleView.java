@@ -36,7 +36,8 @@ public class BubbleView extends View {
         //this.setRotation( 45 );
     }
 
-    public void rotateBubble( int degrees ){
+    public void rotateBubble(float degrees){
+        this.setRotation((degrees + 45) % 360);
     }
 
     protected void onDraw(Canvas canvas) {
