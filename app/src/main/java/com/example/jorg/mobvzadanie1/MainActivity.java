@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.graphics.drawable.shapes.RectShape;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -216,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             touch_start(w/2, h/2);
             currentPoint = new Point(w/2, h/2);
+            draw();
         }
 
         @Override
@@ -226,6 +230,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
             canvas.drawPath(mPath, mPaint);
             canvas.drawPath(circlePath, circlePaint);
+
+
+
+            ShapeDrawable arrow = new ShapeDrawable( new RectShape() );
+            int radius = 20;
+            int diff = 10;
+            int x = (int) currentPoint.getX();
+            int y = (int) currentPoint.getY();
+            System.out.println(x+" : "+y);
+            arrow.setBounds(x-(radius/2)-diff, y-(radius/2)-diff, x + (radius/2)-diff, y + (radius/2)-diff);
+
+            arrow.getPaint().setColor(0xff000000);
+
+            //canvas.rotate(45);
+            arrow.draw(canvas);
+            //canvas.rotate(-45);
+
+            ShapeDrawable bubble = new ShapeDrawable(new OvalShape());
+            bubble.getPaint().setColor(0xff00cccc);
+            bubble.setBounds(x-radius, y-radius, x + radius, y + radius);
+
+            bubble.draw(canvas);
         }
 
         private void touch_start(float x, float y)
@@ -244,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             currentPoint = newCurrentPoint;
 
             circlePath.reset();
-            circlePath.addCircle(currentPoint.getX(), currentPoint.getY(), 30, Path.Direction.CW);
+            //circlePath.addCircle(currentPoint.getX(), currentPoint.getY(), 30, Path.Direction.CW);
 
             invalidate();
         }
