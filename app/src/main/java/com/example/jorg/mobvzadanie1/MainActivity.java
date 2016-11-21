@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,8 +14,11 @@ import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,29 +80,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         //This features analyzes accelerometer input for steps and  triggers an event for every step.
-        if( manager.getSensorList(Sensor.TYPE_STEP_DETECTOR).size() != 0 ) {
+        if (manager.getSensorList(Sensor.TYPE_STEP_DETECTOR).size() != 0)
+        {
             Sensor stepDetectorSensor = manager.getSensorList(Sensor.TYPE_STEP_DETECTOR).get(0);
             manager.registerListener(stepListener, stepDetectorSensor, SensorManager.SENSOR_DELAY_GAME);
-        } else {
-            //textView4.setText("Sensor.TYPE_STEP_DETECTOR missing!");
         }
     }
 
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        /* todo: zatial netreba
 
-        builder.setLength( 0 );
-        builder.append("x: ");
-        builder.append(Math.round(event.values[0]*10)/10);
-        builder.append("y: ");
-        builder.append(Math.round(event.values[0]*10)/10);
-        builder.append("z: ");
-        builder.append(Math.round(event.values[0]*10)/10);
-
-        textView.setText(builder.toString());
-        */
     }
 
     @Override
@@ -124,9 +116,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     SensorManager.getOrientation(R, orientation);// orientation contains: azimut, pitch and roll
 
                     azimut = (float) Math.round(Math.toDegrees(orientation[0]));
-                    // todo: tieto dve mi zatial nebolo treba
-                    //pitch = (float) Math.round(Math.toDegrees(orientation[1]));
-                    //roll = (float) Math.round(Math.toDegrees(orientation[2]));
                 }
             }
         }
@@ -150,103 +139,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 value = (int) values[0];
             }
 
-            if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-                // todo: mozno je lepsie implementovat cez step_counter
-                //textView3.setText("Step Counter Detected : " + value);
-            } else if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+            if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
                 stepDetectorCounter++;
-                dv.draw();
+                dv.draw(azimut);
             }
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-        }
-    }
-
-    public class DrawingView extends View
-    {
-        private Bitmap mBitmap;
-        private Canvas mCanvas;
-        private Path mPath;
-        private Paint mBitmapPaint;
-        Context context;
-        private Paint circlePaint;
-        private Path circlePath;
-        private Paint mPaint;
-
-        private Point currentPoint;
-
-        public DrawingView(Context c)
-        {
-            super(c);
-            context=c;
-            mPath = new Path();
-            mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-            circlePaint = new Paint();
-            circlePath = new Path();
-            circlePaint.setAntiAlias(true);
-            circlePaint.setColor(Color.BLUE);
-            circlePaint.setStyle(Paint.Style.STROKE);
-            circlePaint.setStrokeJoin(Paint.Join.MITER);
-            circlePaint.setStrokeWidth(4f);
-            mPaint = new Paint();
-            mPaint.setAntiAlias(true);
-            mPaint.setDither(true);
-            mPaint.setColor(Color.GREEN);
-            mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setStrokeJoin(Paint.Join.ROUND);
-            mPaint.setStrokeCap(Paint.Cap.ROUND);
-            mPaint.setStrokeWidth(13);
-
-            currentPoint = new Point(120, 50);
-
-            mBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
-            mCanvas = new Canvas(mBitmap);
-        }
-
-        @Override
-        protected void onSizeChanged(int w, int h, int oldw, int oldh)
-        {
-            super.onSizeChanged(w, h, oldw, oldh);
-
-            mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            mCanvas = new Canvas(mBitmap);
-
-            touch_start(w/2, h/2);
-            currentPoint = new Point(w/2, h/2);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas)
-        {
-            super.onDraw(canvas);
-
-            canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-            canvas.drawPath(mPath, mPaint);
-            canvas.drawPath(circlePath, circlePaint);
-        }
-
-        private void touch_start(float x, float y)
-        {
-            mPath.reset();
-            mPath.moveTo(x, y);
-        }
-
-        public void draw()
-        {
-            float radians = Utils.azimutToRadians(azimut);
-
-            Point newCurrentPoint = Utils.getNextPoint(currentPoint, radians, Utils.STEP_SIZE);
-
-            mPath.quadTo(newCurrentPoint.getX(), newCurrentPoint.getY(), (currentPoint.getX() + newCurrentPoint.getX()) / 2, (currentPoint.getY() + newCurrentPoint.getY()) / 2);
-            currentPoint = newCurrentPoint;
-
-            circlePath.reset();
-            circlePath.addCircle(currentPoint.getX(), currentPoint.getY(), 30, Path.Direction.CW);
-
-            invalidate();
         }
     }
 }
