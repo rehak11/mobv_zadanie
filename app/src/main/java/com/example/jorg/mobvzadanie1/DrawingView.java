@@ -6,6 +6,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.graphics.drawable.shapes.RectShape;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -30,12 +35,14 @@ public class DrawingView extends View
     private int leftBounds;
     private int rightBounds;
     private int topBounds;
-    private int bottomBounds ;
+    private int bottomBounds;
+
+    private float azimut;
 
     public DrawingView(Context c)
     {
         super(c);
-        context=c;
+        context = c;
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         circlePaint = new Paint();
@@ -58,6 +65,11 @@ public class DrawingView extends View
 
         mBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+
+        arrow = new ShapeDrawable(new RectShape());
+        bubble = new ShapeDrawable(new OvalShape());
+
+        azimut = 0;
     }
 
     public float mPosX;
@@ -96,7 +108,7 @@ public class DrawingView extends View
                     final float dy = y - mLastTouchY;
                     mPosX -= dx;
                     mPosY -= dy;
-                    scrollTo((int)mPosX, (int)mPosY);
+                    scrollTo((int) mPosX, (int) mPosY);
                     invalidate();
                 }
                 mLastTouchX = x;
@@ -115,11 +127,11 @@ public class DrawingView extends View
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
 
-        touch_start(w/2, h/2);
-        currentPoint = new Point(w/2, h/2);
+        touch_start(w / 2, h / 2);
+        currentPoint = new Point(w / 2, h / 2);
 
-        mPosX = w/2;
-        mPosY = h/2;
+        mPosX = w / 2;
+        mPosY = h / 2;
 
         leftBounds = 200;
         rightBounds = w - 200;
@@ -135,6 +147,25 @@ public class DrawingView extends View
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
         canvas.drawPath(circlePath, circlePaint);
+
+        int radius = 20;
+        int diff = 10;
+        int x = (int) currentPoint.getX();
+        int y = (int) currentPoint.getY();
+
+        arrow.setBounds(x-(radius/2)-diff, y-(radius/2)-diff, x + (radius/2)-diff, y + (radius/2)-diff);
+        arrow.getPaint().setColor(0xff000000);
+
+        bubble.getPaint().setColor(0xff00cccc);
+        bubble.setBounds(x-radius, y-radius, x + radius, y + radius);
+
+        canvas.save();
+        canvas.rotate((azimut + 45) % 360, x, y);
+
+        arrow.draw(canvas);
+        bubble.draw(canvas);
+
+        canvas.restore();
     }
 
     private void touch_start(float x, float y)
@@ -143,9 +174,9 @@ public class DrawingView extends View
         mPath.moveTo(x, y);
     }
 
-    public void draw(float azimut)
+    public void move()
     {
-        float radians = Utils.azimutToRadians(azimut);
+        float radians = Utils.azimutToRadians(this.azimut);
 
         Point newCurrentPoint = Utils.getNextPoint(currentPoint, radians, Utils.STEP_SIZE);
 
@@ -153,10 +184,15 @@ public class DrawingView extends View
 
         mPath.quadTo(newCurrentPoint.getX(), newCurrentPoint.getY(), (currentPoint.getX() + newCurrentPoint.getX()) / 2, (currentPoint.getY() + newCurrentPoint.getY()) / 2);
         currentPoint = newCurrentPoint;
+        invalidate();
+    }
 
-        circlePath.reset();
-        circlePath.addCircle(currentPoint.getX(), currentPoint.getY(), 30, Path.Direction.CW);
+    private ShapeDrawable arrow;
+    private ShapeDrawable bubble;
 
+    public void applyAzimut(float azimut)
+    {
+        this.azimut = azimut;
         invalidate();
     }
 
@@ -167,24 +203,28 @@ public class DrawingView extends View
             scrollBy(-20, 0);
             leftBounds -= 20;
             rightBounds -= 20;
+            mLastTouchX += 20;
         }
         if (newPoint.getY() < topBounds)
         {
             scrollBy(0, -20);
             topBounds -= 20;
             bottomBounds -= 20;
+            mLastTouchY += 20;
         }
         if (newPoint.getX() > rightBounds)
         {
             scrollBy(20, 0);
             rightBounds += 20;
             leftBounds += 20;
+            mLastTouchX -= 20;
         }
         if (newPoint.getY() > bottomBounds)
         {
             scrollBy(0, 20);
             bottomBounds += 20;
             topBounds += 20;
+            mLastTouchY -= 20;
         }
     }
 }

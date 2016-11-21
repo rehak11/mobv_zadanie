@@ -26,6 +26,9 @@ public class Utils
     {
         float degrees = azimutToDegrees(azimut);
 
+        degrees -= 90;
+        degrees = degrees % 360;
+
         return degreesToRadians(degrees);
     }
 

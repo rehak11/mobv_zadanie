@@ -31,9 +31,9 @@ import java.util.Date;
 
 //http://stackoverflow.com/questions/8264518/using-accelerometer-gyroscope-and-compass-to-calculate-devices-movement-in-3d
 //https://www.youtube.com/watch?v=C7JQ7Rpwn2k
-// todo: pridat namiesto kruhu, ktory ukazuje aktualnu poziciu, to bubbleView, nech vidime kam je user prave otoceny
-// todo: spresnit step counter nejak .. nefugunje to velmi dobre
-// todo: treba nejak spravit aby ked pouzivatel vyjde mimo obrazovky aby obrazovka sla s nim .. alebo mozno zoom out
+// todo: pri prvom dotyku obrazovky to posunie zle -
+//      fixnut scrollovanie prstom - v drawingView sa to robi v metode scrollView by sa mali
+//      nejak nastavit mLastTouch, alebo mozno aj nejak uplne inac
 public class MainActivity extends AppCompatActivity implements SensorEventListener
 {
     DrawingView dv;
@@ -119,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     SensorManager.getOrientation(R, orientation);// orientation contains: azimut, pitch and roll
 
                     azimut = (float) Math.round(Math.toDegrees(orientation[0]));
+
+                    dv.applyAzimut(azimut);
                 }
             }
         }
@@ -144,7 +146,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
                 stepDetectorCounter++;
-                dv.draw(azimut);
+
+                dv.move();
+                dv.applyAzimut(azimut);
             }
         }
 
