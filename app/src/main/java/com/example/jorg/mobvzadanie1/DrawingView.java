@@ -6,18 +6,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.RectShape;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
-
-import com.example.jorg.mobvzadanie1.Point;
-import com.example.jorg.mobvzadanie1.Utils;
 
 public class DrawingView extends View
 {
@@ -76,7 +69,6 @@ public class DrawingView extends View
     public float mPosY;
     public float mLastTouchX;
     public float mLastTouchY;
-    ScaleGestureDetector mScaleDetector;
     int mActivePointerId;
 
     @Override
@@ -95,22 +87,17 @@ public class DrawingView extends View
             }
             case MotionEvent.ACTION_MOVE:
             {
-                final int pointerIndex = event
-                        .findPointerIndex(mActivePointerId);
+                final int pointerIndex = event.findPointerIndex(mActivePointerId);
                 final float x = event.getX(pointerIndex);
                 final float y = event.getY(pointerIndex);
 
-                // todo: fix scale detector check
-                // Only move if the ScaleGestureDetector isn't processing a gesture.
-                //if (!mScaleDetector.isInProgress())
-                {
-                    final float dx = x - mLastTouchX;
-                    final float dy = y - mLastTouchY;
-                    mPosX -= dx;
-                    mPosY -= dy;
-                    scrollTo((int) mPosX, (int) mPosY);
-                    invalidate();
-                }
+                final float dx = x - mLastTouchX;
+                final float dy = y - mLastTouchY;
+                mPosX -= dx;
+                mPosY -= dy;
+                scrollTo((int) mPosX, (int) mPosY);
+                invalidate();
+
                 mLastTouchX = x;
                 mLastTouchY = y;
                 break;
@@ -130,8 +117,8 @@ public class DrawingView extends View
         touch_start(w / 2, h / 2);
         currentPoint = new Point(w / 2, h / 2);
 
-        mPosX = w / 2;
-        mPosY = h / 2;
+        mPosX = 0;
+        mPosY = 0;
 
         leftBounds = 200;
         rightBounds = w - 200;
@@ -160,7 +147,7 @@ public class DrawingView extends View
         bubble.setBounds(x-radius, y-radius, x + radius, y + radius);
 
         canvas.save();
-        canvas.rotate((azimut + 45) % 360, x, y);
+        canvas.rotate(((azimut + 135) + 360) % 360, x, y);
 
         arrow.draw(canvas);
         bubble.draw(canvas);
@@ -184,6 +171,7 @@ public class DrawingView extends View
 
         mPath.quadTo(newCurrentPoint.getX(), newCurrentPoint.getY(), (currentPoint.getX() + newCurrentPoint.getX()) / 2, (currentPoint.getY() + newCurrentPoint.getY()) / 2);
         currentPoint = newCurrentPoint;
+
         invalidate();
     }
 
@@ -200,31 +188,31 @@ public class DrawingView extends View
     {
         if (newPoint.getX() < leftBounds)
         {
-            scrollBy(-20, 0);
-            leftBounds -= 20;
-            rightBounds -= 20;
-            mLastTouchX += 20;
+            scrollBy(-Utils.STEP_SIZE, 0);
+            leftBounds -= Utils.STEP_SIZE;
+            rightBounds -= Utils.STEP_SIZE;
+            mPosX -= Utils.STEP_SIZE;
         }
         if (newPoint.getY() < topBounds)
         {
-            scrollBy(0, -20);
-            topBounds -= 20;
-            bottomBounds -= 20;
-            mLastTouchY += 20;
+            scrollBy(0, -Utils.STEP_SIZE);
+            topBounds -= Utils.STEP_SIZE;
+            bottomBounds -= Utils.STEP_SIZE;
+            mPosY -= Utils.STEP_SIZE;
         }
         if (newPoint.getX() > rightBounds)
         {
-            scrollBy(20, 0);
-            rightBounds += 20;
-            leftBounds += 20;
-            mLastTouchX -= 20;
+            scrollBy(Utils.STEP_SIZE, 0);
+            rightBounds += Utils.STEP_SIZE;
+            leftBounds += Utils.STEP_SIZE;
+            mPosX += Utils.STEP_SIZE;
         }
         if (newPoint.getY() > bottomBounds)
         {
-            scrollBy(0, 20);
-            bottomBounds += 20;
-            topBounds += 20;
-            mLastTouchY -= 20;
+            scrollBy(0, Utils.STEP_SIZE);
+            bottomBounds += Utils.STEP_SIZE;
+            topBounds += Utils.STEP_SIZE;
+            mPosY += Utils.STEP_SIZE;
         }
     }
 }

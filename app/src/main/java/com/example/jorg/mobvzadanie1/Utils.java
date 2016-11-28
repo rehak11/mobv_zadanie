@@ -1,7 +1,5 @@
 package com.example.jorg.mobvzadanie1;
 
-import android.util.Log;
-
 /**
  * Created by GabrielK on 12-Nov-16.
  */
@@ -26,8 +24,7 @@ public class Utils
     {
         float degrees = azimutToDegrees(azimut);
 
-        degrees -= 90;
-        degrees = degrees % 360;
+        degrees = (degrees + 360) % 360;
 
         return degreesToRadians(degrees);
     }
