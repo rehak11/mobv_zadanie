@@ -22,6 +22,7 @@ public class DrawingView extends View
     private Paint circlePaint;
     private Path circlePath;
     private Paint mPaint;
+    private Paint startPointPaint;
 
     private Point currentPoint;
 
@@ -53,6 +54,8 @@ public class DrawingView extends View
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(13);
+        startPointPaint = new Paint();
+        startPointPaint.setColor(Color.GREEN);
 
         currentPoint = new Point(120, 50);
 
@@ -134,6 +137,7 @@ public class DrawingView extends View
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
         canvas.drawPath(circlePath, circlePaint);
+        canvas.drawCircle(mBitmap.getWidth()/2,mBitmap.getHeight()/2,18,startPointPaint);
 
         int radius = 20;
         int diff = 10;
@@ -145,7 +149,7 @@ public class DrawingView extends View
 
         bubble.getPaint().setColor(0xff00cccc);
         bubble.setBounds(x-radius, y-radius, x + radius, y + radius);
-
+        
         canvas.save();
         canvas.rotate(((azimut + 135) + 360) % 360, x, y);
 
