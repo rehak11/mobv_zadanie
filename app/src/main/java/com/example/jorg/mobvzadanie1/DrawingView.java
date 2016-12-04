@@ -9,8 +9,11 @@ import android.graphics.Path;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.RectShape;
+import android.support.design.widget.FloatingActionButton;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 public class DrawingView extends View
 {
@@ -26,6 +29,8 @@ public class DrawingView extends View
 
     private Point currentPoint;
 
+    private FloatingActionButton fab;
+
     private int leftBounds;
     private int rightBounds;
     private int topBounds;
@@ -36,6 +41,22 @@ public class DrawingView extends View
     public DrawingView(Context c)
     {
         super(c);
+        init(c);
+    }
+
+    public DrawingView(Context c, AttributeSet a)
+    {
+        super(c, a);
+        init(c);
+    }
+
+    public DrawingView(Context c, AttributeSet a, int defStyle)
+    {
+        super(c, a, defStyle);
+        init(c);
+    }
+
+    private void init(Context c) {
         context = c;
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
