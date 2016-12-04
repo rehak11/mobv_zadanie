@@ -24,7 +24,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
 
         dv = new DrawingView(this);
-        setContentView(dv);
+        
+        setContentView(R.layout.activity_main);
+
+        DrawingView drv = (DrawingView) findViewById(R.id.drv);
+        ViewGroup parent = (ViewGroup) drv.getParent();
+        int index = parent.indexOfChild(drv);
+        parent.removeView(drv);
+        parent.addView(dv);
 
         SensorManager manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor accelerometer = manager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
@@ -111,5 +118,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
         }
+    }
+    
+    public void restartActivity(View v) {
+        Intent intent = new Intent();
+        intent.setClass(this, this.getClass());
+        this.startActivity(intent);
+        this.finish();
     }
 }
