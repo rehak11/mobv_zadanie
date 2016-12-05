@@ -1,12 +1,18 @@
 package com.example.jorg.mobvzadanie1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+
 
 //http://stackoverflow.com/questions/8264518/using-accelerometer-gyroscope-and-compass-to-calculate-devices-movement-in-3d
 //https://www.youtube.com/watch?v=C7JQ7Rpwn2k
@@ -24,7 +30,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
 
         dv = new DrawingView(this);
-        setContentView(dv);
+        
+        setContentView(R.layout.activity_main);
+
+        DrawingView drv = (DrawingView) findViewById(R.id.drv);
+        ViewGroup parent = (ViewGroup) drv.getParent();
+        int index = parent.indexOfChild(drv);
+        parent.removeView(drv);
+        parent.addView(dv);
 
         SensorManager manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor accelerometer = manager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
@@ -111,5 +124,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
         }
+    }
+    
+    public void restartActivity(View v) {
+        Intent intent = new Intent();
+        intent.setClass(this, this.getClass());
+        this.startActivity(intent);
+        this.finish();
     }
 }
